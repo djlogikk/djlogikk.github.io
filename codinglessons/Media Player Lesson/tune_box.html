@@ -1,0 +1,116 @@
+<html>
+<head>
+<title>My tune box</title>
+</head>
+<body onload="document.getElementById('volume').value = 90; SetTrackInfo(tracks[track_number]);">
+<script src="howler.js-master/dist/howler.js"></script>
+<script>
+var isPlaying = false;
+
+var tracks = [
+    'Route 66.mp3',
+    'Dona Nobis Pacem.mp3'
+    // add additional tracks here seperated by commas
+    ];
+    
+var track_number = 0;
+var sound = null; // will be used to hold our Howl media player
+var volume = 90; // todo
+
+// This function should play the music, or if already playing
+// it should stop the music.
+function Play()
+{
+    if (!isPlaying)
+    {
+        // PLAY
+        if (track_number < 0) track_number = tracks.length - 1; // reverse loop
+        if (track_number >= tracks.length) track_number = 0; // forward loop
+        if (sound == null)
+        {
+            // create our Howl media player object
+            sound = new Howl({
+                src: [tracks[track_number]]
+            });
+            sound.volume(volume / 100);
+            sound.on('end', function() {
+                isPlaying = false;
+                track_number++; // go to the next track
+                sound = null;
+                Play();
+            });
+        }
+        sound.play();
+        isPlaying = true;
+        document.getElementById("playpausebutton").src = "pause_btn.png";
+        
+        SetTrackInfo(tracks[track_number]);
+    }
+    else
+    {
+        // PAUSE
+        sound.pause();
+        isPlaying = false;
+        document.getElementById("playpausebutton").src = "play_btn.png";
+    }
+}
+
+function Stop()
+{
+    if (sound!=null) sound.stop();
+    isPlaying = false;
+    sound = null;
+}
+
+function Prev()
+{
+    // skip to previous track
+    Stop();
+    track_number--; // go to prev track;   
+    Play();
+}
+
+function Next()
+{
+    // skip to next track
+    Stop();
+    track_number++; // go to next track;
+    Play();
+}
+
+function SetVolume(value)
+{
+    volume = value;
+    if (sound != null) 
+    {
+        sound.volume(volume / 100);
+    }
+    document.getElementById("volume_value").innerHTML = volume;
+}
+
+function SetTrackInfo(trackname)
+{
+    document.getElementById("trackinfo").innerHTML = trackname;
+}
+</script>
+<h1>My tune box</h1>
+
+<p id="trackinfo"></p>
+
+<input type="range" id="volume" oninput="SetVolume(this.value)" onchange="SetVolume(this.value)"> <span id="volume_value">90</span>
+<br />
+<br />
+
+<img src="skip_track_back_btn.png" onclick="Prev();">
+<img id="playpausebutton" src="play_btn.png" onclick="Play();">
+<img src="skip_track_forward_btn.png" onclick="Next();">
+
+<br />
+<br />
+<a href="https://github.com/djlogikk/djlogikk.github.io" target="_blank">source code &gt; &gt;</a>
+<br />
+<br />
+<a href="../index.html">&lt; go back</a>
+
+</body>
+</html>
